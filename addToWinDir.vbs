@@ -37,7 +37,9 @@ else
         wscript.quit 
     end if
     rightName = Right(argFullPath,Len(argFullPath) - InStrRev(argFullPath,"\"))
-    rightName = Left(rightName, InStrRev(rightName,".")-1)
+    if InStr(rightName,".")<>0 then
+        rightName = Left(rightName, InStrRev(rightName,".")-1)
+    end if
     name = inputbox("这里设置的值，在运行(win+R)里输入即可打开你的文件。Author: ljtd","输入快捷指令",rightName)
     if(name="")then 
         wscript.quit 
