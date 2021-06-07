@@ -6,16 +6,36 @@ fullName = wscript.ScriptFullName
 
 pos = InStrRev(fullName,"\")
 
-partName = Left(fullName,pos)
+pathName = Left(fullName,pos)
 
-'msgbox( "当前 文件夹 路径是 " & partName)
+'msgbox( "当前 文件夹 路径是 " & pathName)
 set objWsh = CreateObject("WScript.Shell")
 strApp = objWsh.ExpandEnvironmentStrings("%AppData%") 
 strSendTo = strApp & "\Microsoft\Windows\SendTo\"
 'msgbox(strSendTo)
 
-'msgbox strSendTo=partName
+strWinDir = strApp & "\WinDir\"
+Dim fso
+Set fso=CreateObject("Scripting.FileSystemObject")        
+If fso.folderExists(strWinDir) Then         
+        
+Else 
+    fso.CreateFolder(strWinDir)
+End If 
 
+Set WshShell = Wscript.CreateObject("Wscript.Shell")
+strPath = WshShell.Environment("user").Item("path")
+'msgbox strPath
+if InStr(strPath, strWinDir)<=0 then
+   
+    WshShell.Environment("user").Item("path")=strWinDir &";"& WshShell.Environment("user").Item("path")
+    Set WshShell = Nothing
+end if 
+
+
+'msgbox strSendTo=pathName
+
+' 读取参数文件地址
 dim argFullPath
 Set oArgs = WScript.Arguments
     For Each s In oArgs
@@ -24,7 +44,7 @@ Set oArgs = WScript.Arguments
 Set oArgs = Nothing
 
 
-if(not(strSendTo=partName))then
+if(not(strSendTo=pathName))then
     ' copy to
     Set fso = CreateObject("Scripting.FileSystemObject")
     fso.CopyFile fullName, strSendTo
@@ -45,7 +65,7 @@ else
         wscript.quit 
     end if
     Set WshShell=WScript.CreateObject("WScript.shell")
-    Set Shortcut=WshShell.CreateShortCut("C:\WINDOWS\" & name & ".lnk") 
+    Set Shortcut=WshShell.CreateShortCut(strWinDir & name & ".lnk") 
     Shortcut.Hotkey = "" 
     Shortcut.IconLocation = argFullPath
     Shortcut.TargetPath = argFullPath
