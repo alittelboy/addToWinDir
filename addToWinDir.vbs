@@ -2,19 +2,20 @@
 ' this project website : https://github.com/alittelboy/addToWinDir
 
 fullName = wscript.ScriptFullName
-'msgbox( "µ±Ç°ÎÄ¼şÂ·¾¶ÊÇ " & fullName)
+'msgbox( "å½“å‰æ–‡ä»¶è·¯å¾„æ˜¯ " & fullName)
 
 pos = InStrRev(fullName,"\")
 
 pathName = Left(fullName,pos)
 
-'msgbox( "µ±Ç° ÎÄ¼ş¼Ğ Â·¾¶ÊÇ " & pathName)
+'msgbox( "å½“å‰ æ–‡ä»¶å¤¹ è·¯å¾„æ˜¯ " & pathName)
 set objWsh = CreateObject("WScript.Shell")
 strApp = objWsh.ExpandEnvironmentStrings("%AppData%") 
 strSendTo = strApp & "\Microsoft\Windows\SendTo\"
-'msgbox(strSendTo)
+' msgbox("Install Location:" & strSendTo)
 
 strWinDir = strApp & "\WinDir\"
+
 Dim fso
 Set fso=CreateObject("Scripting.FileSystemObject")        
 If fso.folderExists(strWinDir) Then         
@@ -35,7 +36,7 @@ end if
 
 'msgbox strSendTo=pathName
 
-' ¶ÁÈ¡²ÎÊıÎÄ¼şµØÖ·
+' è¯»å–å‚æ•°æ–‡ä»¶åœ°å€
 dim argFullPath
 Set oArgs = WScript.Arguments
     For Each s In oArgs
@@ -46,21 +47,38 @@ Set oArgs = Nothing
 
 if(not(strSendTo=pathName))then
     ' copy to
+	msgbox("Install Location:" & strSendTo)
+	' msgbox("Commands Location:" & strWinDir)
     Set fso = CreateObject("Scripting.FileSystemObject")
     fso.CopyFile fullName, strSendTo
-    msgbox "ÒÑ¾­¸´ÖÆµ½sendto¡£ÄãÒÑ¾­ÉèÖÃ³É¹¦£¬ÓÒ¼üÈÎºÎÎÄ¼ş£¬·¢ËÍµ½£¬±¾Èí¼ş£¬¼´¿ÉĞÂ½¨Ö¸Áî´ò¿ªÄÇ¸öÎÄ¼ş"
+    ' msgbox "å·²ç»å¤åˆ¶åˆ°sendtoã€‚ä½ å·²ç»è®¾ç½®æˆåŠŸï¼Œå³é”®ä»»ä½•æ–‡ä»¶ï¼Œå‘é€åˆ°ï¼Œæœ¬è½¯ä»¶ï¼Œå³å¯æ–°å»ºæŒ‡ä»¤æ‰“å¼€é‚£ä¸ªæ–‡ä»¶"
+    msgbox "Successfuly copied to path SendTo. Installation finished. Right click the file you want, send to, this app, to create cmd"
+	Set WshShell=WScript.CreateObject("WScript.shell")
+    Set Shortcut=WshShell.CreateShortCut(strWinDir & "windir.lnk") 
+    Shortcut.Hotkey = "" 
+    Shortcut.IconLocation = strWinDir
+    Shortcut.TargetPath = strWinDir
+    Shortcut.Save 
+	Set WshShell=WScript.CreateObject("WScript.shell")
+    Set Shortcut=WshShell.CreateShortCut(strWinDir & "send2.lnk") 
+    Shortcut.Hotkey = "" 
+    Shortcut.IconLocation = strSendTo
+    Shortcut.TargetPath = strSendTo
+    Shortcut.Save 
 
 else
     ' msgbox "is here"
     if(argFullPath="")then 
-        msgbox("ÄãÒÑ¾­ÉèÖÃ³É¹¦£¬ÓÒ¼üÈÎºÎÎÄ¼ş£¬·¢ËÍµ½£¬±¾Èí¼ş£¬¼´¿ÉĞÂ½¨Ö¸Áî´ò¿ªÄÇ¸öÎÄ¼ş")
+        ' msgbox("ä½ å·²ç»è®¾ç½®æˆåŠŸï¼Œå³é”®ä»»ä½•æ–‡ä»¶ï¼Œå‘é€åˆ°ï¼Œæœ¬è½¯ä»¶ï¼Œå³å¯æ–°å»ºæŒ‡ä»¤æ‰“å¼€é‚£ä¸ªæ–‡ä»¶")
+		msgbox("You have set up! Right click the file you want, send to, this app, to create cmd")
         wscript.quit 
     end if
     rightName = Right(argFullPath,Len(argFullPath) - InStrRev(argFullPath,"\"))
     if InStr(rightName,".")<>0 then
         rightName = Left(rightName, InStrRev(rightName,".")-1)
     end if
-    name = inputbox("ÕâÀïÉèÖÃµÄÖµ£¬ÔÚÔËĞĞ(win+R)ÀïÊäÈë¼´¿É´ò¿ªÄãµÄÎÄ¼ş¡£Author: ljtd","ÊäÈë¿ì½İÖ¸Áî",rightName)
+    ' name = inputbox("è¿™é‡Œè®¾ç½®çš„å€¼ï¼Œåœ¨è¿è¡Œ(win+R)é‡Œè¾“å…¥å³å¯æ‰“å¼€ä½ çš„æ–‡ä»¶ã€‚Author: ljtd","è¾“å…¥å¿«æ·æŒ‡ä»¤",rightName)
+    name = inputbox("set the command here, use win+R + command to open your fileã€‚Author: ljtd","Set Command",rightName)
     if(name="")then 
         wscript.quit 
     end if
